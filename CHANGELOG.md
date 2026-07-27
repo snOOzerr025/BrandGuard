@@ -2,7 +2,35 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.4.0] - 2026-07-27
+
+### Phase 2 — ABSA / NLP Core
+
+#### Added
+- `backend/app/ml/absa/sentiment_analyzer.py` — Upgraded DistilBERT 3-class analyzer (confidence threshold 0.90 → neutral), batch_size=64, max_length=256 (~2x throughput)
+- `backend/app/ml/absa/aspect_extractor.py` — Upgraded AspectExtractor: 8 aspects (was 4), 3x keyword expansion, sentence-level isolation (polarity scored on matching sentence, not full review)
+- `backend/app/ml/embeddings/encoder.py` — `ReviewEncoder` using `all-MiniLM-L6-v2` (384-dim, L2-normalized, ~2000 texts/sec CPU)
+- `backend/app/ml/embeddings/cluster.py` — `ReviewClusterer` KMeans + TF-IDF auto-labeling for theme discovery
+- `backend/app/ml/eval/evaluator.py` — Eval harness: 300-row stratified hold-out, classification report, writes metrics.json + eval_report.md
+- `backend/app/ml/eval/metrics.json` — **Real F1 numbers** on 300 held-out reviews
+- `backend/app/ml/eval/eval_report.md` — Human-readable eval report
+- `backend/app/services/absa_service.py` — Pipeline orchestrator: lazy model loading, runs sentiment + aspects + embeddings + clusters, writes insert-only SentimentResult rows
+- `backend/tests/unit/test_absa.py` — 22 unit tests across all 4 ML modules using real fixture data
+
+#### Eval Results (threshold=0.90, N=300 held-out)
+- Positive F1: 0.76 | Negative F1: 0.68 | Neutral F1: 0.18 | **Macro F1: 0.54**
+- Negative recall: 0.91 — catches 91% of real negative reviews (critical for brand monitoring)
+
+#### Verified
+- Command: `python -m pytest backend/tests/unit/test_absa.py -v` → `22 passed in 150s`
+- Command: `python -m pytest backend/tests/ -v` (non-ML) → `37 passed in 7.73s`
+- Command: `python -m backend.app.ml.eval.evaluator` → metrics.json + eval_report.md written
+- Total test count across all phases: **59 tests passing**
+
+---
+
 ## [0.3.0] - 2026-07-27
+
 
 ### Phase 1.5 — Auth
 

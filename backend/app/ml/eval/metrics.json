@@ -1,0 +1,66 @@
+{
+  "model": "distilbert-base-uncased-finetuned-sst-2-english",
+  "neutral_threshold": 0.9,
+  "eval_date": "2026-07-27",
+  "holdout_n": 300,
+  "holdout_per_class": {
+    "positive": 100,
+    "negative": 100,
+    "neutral": 100
+  },
+  "per_class": {
+    "positive": {
+      "precision": 0.7232,
+      "recall": 0.81,
+      "f1": 0.7642,
+      "support": 100.0
+    },
+    "negative": {
+      "precision": 0.5417,
+      "recall": 0.91,
+      "f1": 0.6791,
+      "support": 100.0
+    },
+    "neutral": {
+      "precision": 0.55,
+      "recall": 0.11,
+      "f1": 0.1833,
+      "support": 100.0
+    }
+  },
+  "macro_avg": {
+    "precision": 0.605,
+    "recall": 0.61,
+    "f1": 0.5422
+  },
+  "weighted_avg": {
+    "precision": 0.605,
+    "recall": 0.61,
+    "f1": 0.5422
+  },
+  "confusion_matrix": {
+    "labels": [
+      "positive",
+      "negative",
+      "neutral"
+    ],
+    "matrix": [
+      [
+        81,
+        13,
+        6
+      ],
+      [
+        6,
+        91,
+        3
+      ],
+      [
+        25,
+        64,
+        11
+      ]
+    ]
+  },
+  "classification_report_text": "              precision    recall  f1-score   support\n\n    positive       0.72      0.81      0.76       100\n    negative       0.54      0.91      0.68       100\n     neutral       0.55      0.11      0.18       100\n\n    accuracy                           0.61       300\n   macro avg       0.60      0.61      0.54       300\nweighted avg       0.60      0.61      0.54       300\n"
+}
