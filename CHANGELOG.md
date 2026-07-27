@@ -2,7 +2,29 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.0] - 2026-07-27
+
+### Phase 1.5 — Auth
+
+#### Added
+- `backend/app/auth/security.py` — bcrypt password hashing (direct `bcrypt` lib, Python 3.13 compatible) + JWT access/refresh token creation and decode
+- `backend/app/auth/schemas.py` — `SignupRequest`, `LoginRequest`, `TokenResponse`, `UserRead` Pydantic schemas
+- `backend/app/auth/dependencies.py` — `get_current_user` FastAPI dependency (validates Bearer JWT, returns User or 401)
+- `backend/app/auth/router.py` — `POST /auth/signup`, `POST /auth/login`, `POST /auth/refresh`, `GET /auth/me` endpoints
+- `backend/tests/conftest.py` — shared pytest fixtures with in-memory SQLite + TestClient (no Docker required for tests)
+- `backend/tests/unit/test_auth.py` — 11 unit tests: bcrypt hashing, JWT round-trips, token type enforcement, schema validation
+- `backend/tests/integration/test_auth_integration.py` — 12 integration tests hitting real HTTP endpoints
+
+#### Verified
+- Command: `python -m pytest backend/tests/ -v`
+- Output: `37 passed in 6.26s`
+- **Authorization test explicitly verified**: user A's valid token returns only user A's profile, not user B's
+- Passwords never returned in any API response; generic error messages prevent email enumeration
+
+---
+
 ## [0.2.0] - 2026-07-27
+
 
 ### Phase 1 — Data Foundation
 
