@@ -10,6 +10,7 @@ from backend.app.api.routes import products as products_router
 from backend.app.api.routes import reviews as reviews_router
 from backend.app.api.routes import insights as insights_router
 from backend.app.api.routes import chat as chat_router
+from backend.app.api.routes import alerts as alerts_router
 from backend.app.auth import router as auth_router
 from backend.app.core.config import settings
 
@@ -51,6 +52,7 @@ def create_app() -> FastAPI:
     app.include_router(reviews_router.router, prefix="/api/v1", tags=["reviews"])
     app.include_router(insights_router.router, prefix="/api/v1", tags=["insights"])
     app.include_router(chat_router.router, prefix="/api/v1", tags=["ask-brandguard"])
+    app.include_router(alerts_router.router, prefix="/api/v1", tags=["alerts"])
 
     return app
 
