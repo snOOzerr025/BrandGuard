@@ -1,0 +1,66 @@
+# Python bytecode & cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+.eggs/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Virtual Environments
+venv/
+env/
+ENV/
+.venv/
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Databases & local services
+*.db
+*.sqlite
+/data/raw/*
+!/data/raw/.gitkeep
+/data/processed/*
+!/data/processed/.gitkeep
+
+# Output/Generated Files
+aspect_analysis_results_*.csv
+aspect_results_*.csv
+keywords_*.csv
+pros_*.csv
+cons_*.csv
+summary_*.txt
+
+# Hugging Face and PyTorch models cache
+.cache/
+models/
+huggingface/
+*.pkl
+*.h5
+*.ckpt
+*.pt
+*.bin
+*.onnx
+
+# Local log files
+*.log
+logs/

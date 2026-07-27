@@ -1,0 +1,66 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: ankane/pgvector:latest
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_USER: brandguard_admin
+          POSTGRES_PASSWORD: brandguard_secure_password_123
+          POSTGRES_DB: brandguard_db
+        options: >-
+          --health-cmd "pg_isready -U brandguard_admin -d brandguard_db"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11" # Target standard version for runners
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev,ml]"
+
+      - name: Lint with Ruff
+        run: ruff check backend/
+
+      - name: Check formatting with Black
+        run: black --check backend/
+
+      - name: Check import ordering with Isort
+        run: isort --check backend/
+
+      - name: Run tests with Pytest
+        env:
+          ENVIRONMENT: testing
+          POSTGRES_HOST: localhost
+          REDIS_HOST: localhost
+        run: pytest backend/tests/ -v --cov=backend --cov-report=xml

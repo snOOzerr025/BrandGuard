@@ -1,0 +1,157 @@
+[
+  {
+    "id": 1,
+    "product": "iphone 13",
+    "rating": 5,
+    "review": "good execlllent  very bad camera ",
+    "reviewer": "harsh",
+    "timestamp": "2025-11-12 01:25:24"
+  },
+  {
+    "id": 2,
+    "product": "iphone 15",
+    "rating": 2,
+    "review": "camera good battery poor ",
+    "reviewer": "Anonymous",
+    "timestamp": "2025-11-12 01:31:26"
+  },
+  {
+    "id": 3,
+    "product": "boat airpods 141",
+    "rating": 5,
+    "review": "long battery life , decent sound quality , high bass , strong build",
+    "reviewer": "Ashish",
+    "timestamp": "2025-11-12 01:34:58"
+  },
+  {
+    "id": 4,
+    "product": "iphone 16",
+    "rating": 4,
+    "review": "good best",
+    "reviewer": "Anonymous",
+    "timestamp": "2025-11-12 01:38:29"
+  },
+  {
+    "id": 5,
+    "product": "iphone 14",
+    "rating": 5,
+    "review": "good bad sexy",
+    "reviewer": "Anonymous",
+    "timestamp": "2025-11-12 01:43:10"
+  },
+  {
+    "id": 6,
+    "product": "iphone 19",
+    "rating": 4,
+    "review": "best recommended",
+    "reviewer": "Anonymous",
+    "timestamp": "2025-11-12 01:58:00"
+  },
+  {
+    "id": 7,
+    "product": "samsung s24",
+    "rating": 4,
+    "review": "best phone in this price",
+    "reviewer": "Anonymous",
+    "timestamp": "2025-11-12 02:02:51"
+  },
+  {
+    "id": 8,
+    "product": "lenovo loq 2050",
+    "rating": 4,
+    "review": "military grade build , battery life high , os is fast and camera is bad",
+    "reviewer": "ash",
+    "timestamp": "2025-11-12 02:06:58"
+  },
+  {
+    "id": 9,
+    "product": "iphone 12",
+    "rating": 4,
+    "review": "good best",
+    "reviewer": "harsh",
+    "timestamp": "2025-11-12 02:11:56"
+  },
+  {
+    "id": 10,
+    "product": "iphone 10",
+    "rating": 4,
+    "review": "good best",
+    "reviewer": "Anonymous",
+    "timestamp": "2025-11-12 02:12:20"
+  },
+  {
+    "id": 11,
+    "product": "iphone 20",
+    "rating": 3,
+    "review": "good",
+    "reviewer": "Anonymous",
+    "timestamp": "2025-11-12 02:14:26"
+  },
+  {
+    "id": 12,
+    "product": "iphone 21",
+    "rating": 3,
+    "review": "best",
+    "reviewer": "harsh",
+    "timestamp": "2025-11-12 02:14:42"
+  },
+  {
+    "id": 13,
+    "product": "iphone 21",
+    "rating": 3,
+    "review": "best\ngood",
+    "reviewer": "harsh",
+    "timestamp": "2025-11-12 02:15:02"
+  },
+  {
+    "id": 14,
+    "product": "iphone 10",
+    "rating": 5,
+    "review": "gjhvjvn",
+    "reviewer": "Anonymous",
+    "timestamp": "2025-11-12 03:16:29"
+  },
+  {
+    "id": 15,
+    "product": "i pill",
+    "rating": 5,
+    "review": "didt work as expected got the product after 9 months",
+    "reviewer": "ashsih",
+    "timestamp": "2025-11-13 10:25:41"
+  },
+  {
+    "id": 16,
+    "product": "headphone",
+    "rating": 5,
+    "review": "doest work like expected and also did not like the colour of the headphones",
+    "reviewer": "ashsih",
+    "timestamp": "2025-11-13 10:27:52"
+  },
+  {
+    "id": 17,
+    "product": "headphone",
+    "rating": 2,
+    "review": "doest work like expected and also did not like the colour of the headphones",
+    "reviewer": "ashsih",
+    "timestamp": "2025-11-13 10:28:05"
+  },
+  {
+    "id": 18,
+    "product": "realme 11",
+    "rating": 3,
+    "review": "good batterry life , bad build quality , decent camera , ",
+    "reviewer": "ashsih",
+    "timestamp": "2025-11-13 10:29:24"
+  },
+  {
+    "id": 19,
+    "product_name": "haldiram bhuji",
+    "reviewer_name": "Anmol",
+    "rating": 5,
+    "review_text": "qualityis amazing ,good amount",
+    "category": "Food & Beverages",
+    "price_paid": 89.0,
+    "recommend": "Yes",
+    "timestamp": "2025-11-13 10:40:20"
+  }
+]
