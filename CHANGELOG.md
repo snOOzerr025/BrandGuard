@@ -2,7 +2,34 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.0] - 2026-07-27
+
+### Phase 4 — Ask BrandGuard (RAG)
+
+#### Added
+- `backend/app/rag/schemas.py` — Strict Pydantic types: `QueryType` enum (PURE_VECTOR / SQL_AGGREGATE / HYBRID), `RouteDecision`, `ReviewChunk`, `Citation`, `ChatResponse`, `ChatRequest`
+- `backend/app/rag/gemini_client.py` — Google GenAI SDK (`google-genai`, not the deprecated package). Two structured-output calls: `classify_query()` → `RouteDecision`, `generate_answer()` → `ChatResponse`. Safe fallback when `GEMINI_API_KEY` is absent.
+- `backend/app/rag/retriever.py` — `PgVectorRetriever` (production, pgvector cosine with hard `WHERE user_id + product_id`), `FallbackRetriever` (SQLite / tests, recent reviews by date). Auto-detected via engine dialect.
+- `backend/app/rag/context_builder.py` — Markdown context assembler: product header, pre-computed aspect summary, SQL metrics block, retrieved review chunks with review_id + similarity score
+- `backend/app/services/chat_service.py` — Full RAG orchestrator: classify → embed → retrieve → aggregate → build context → Gemini answer → async QueryLog insert
+- `backend/app/api/routes/chat.py` — `POST /api/v1/products/{id}/chat` auth-gated endpoint. Returns `ChatResponse` with answer, citations (real review UUIDs), confidence, query_type_used.
+- `backend/tests/integration/test_chat_api.py` — 8 integration tests: auth, 404 isolation, cross-user protection, schema validation, QueryLog persistence, empty product graceful handling
+
+#### Architecture Invariants
+- Vector search is NEVER used for time-series trend queries — SQL aggregation on stored SentimentResult rows only
+- Every retrieval call has a hard `WHERE user_id AND product_id` clause at the SQL level
+- Gemini uses structured output schema (`response_schema` + `application/json`) — no text-parsing of citations
+- QueryLog DB insert runs in a BackgroundTask — response never blocks on the write
+
+#### Verified
+- Command: `python -m pytest backend/tests/integration/test_chat_api.py -v -W error::FutureWarning` → `8 passed, 0 warnings`
+- SDK: migrated from deprecated `google-generativeai` → `google-genai`
+- Total test count: **82 tests passing** (60 non-ML + 22 ABSA)
+
+---
+
 ## [0.4.0] - 2026-07-27
+
 
 ### Phase 2 — ABSA / NLP Core
 
