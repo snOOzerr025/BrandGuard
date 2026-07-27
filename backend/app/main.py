@@ -6,6 +6,9 @@ from fastapi.middleware.cors import CORSMiddleware
 # Initialize logging on startup
 import backend.app.core.logging as app_logging
 from backend.app.api.routes import health
+from backend.app.api.routes import products as products_router
+from backend.app.api.routes import reviews as reviews_router
+from backend.app.api.routes import insights as insights_router
 from backend.app.auth import router as auth_router
 from backend.app.core.config import settings
 
@@ -43,6 +46,9 @@ def create_app() -> FastAPI:
     # Register API routes
     app.include_router(health.router, prefix="/api/v1", tags=["healthcheck"])
     app.include_router(auth_router.router, prefix="/api/v1", tags=["auth"])
+    app.include_router(products_router.router, prefix="/api/v1", tags=["products"])
+    app.include_router(reviews_router.router, prefix="/api/v1", tags=["reviews"])
+    app.include_router(insights_router.router, prefix="/api/v1", tags=["insights"])
 
     return app
 

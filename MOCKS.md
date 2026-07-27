@@ -1,4 +1,5 @@
 # Active Mocks Tracker
 
-No active mocks.
-All endpoints and ML pipelines in Phase 0 run against real structures.
+| Mock | Location | Removes In |
+|---|---|---|
+| `POST /products/{id}/analyze` runs background task but has no job-tracking ID or status poll endpoint | `backend/app/api/routes/insights.py` | Phase 7 (Celery + Redis job queue) |

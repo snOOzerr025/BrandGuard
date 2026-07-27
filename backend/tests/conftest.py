@@ -14,14 +14,29 @@ import backend.app.models  # noqa: F401 — registers all model metadata
 
 @pytest.fixture(name="engine")
 def engine_fixture():
-    """In-memory SQLite engine — fresh per test session."""
+    """
+    In-memory SQLite engine — fresh per test session.
+
+    Also patches backend.app.db.session.engine so that background tasks
+    spawned by FastAPI (e.g. POST /analyze _run_pipeline) use the same
+    test DB instead of trying to connect to Postgres.
+    """
+    import backend.app.db.session as db_session
+
     engine = create_engine(
         "sqlite://",
         connect_args={"check_same_thread": False},
         poolclass=StaticPool,
     )
     SQLModel.metadata.create_all(engine)
+
+    # Patch module-level engine so background tasks get the test DB
+    original_engine = db_session.engine
+    db_session.engine = engine
+
     yield engine
+
+    db_session.engine = original_engine  # restore after test
     SQLModel.metadata.drop_all(engine)
 
 
