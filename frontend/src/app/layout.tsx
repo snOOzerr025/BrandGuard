@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, JetBrains_Mono } from "next/font/google";
+import { Inter, JetBrains_Mono, Playfair_Display } from "next/font/google";
 import "./globals.css";
 
 const inter = Inter({
@@ -14,10 +14,17 @@ const jetbrainsMono = JetBrains_Mono({
   display: "swap",
 });
 
+const playfair = Playfair_Display({
+  subsets: ["latin"],
+  variable: "--font-playfair",
+  display: "swap",
+  style: ["normal", "italic"],
+});
+
 export const metadata: Metadata = {
-  title: "BrandGuard — Deterministic Review Intelligence Engine",
+  title: "BrandGuard — High-Fashion Review Intelligence & Deterministic Audit Engine",
   description:
-    "Enterprise decision-grade review intelligence SaaS platform powered by DeBERTa-v3 ABSA, HDBSCAN micro-theme induction, STL+EWMA control charts, and zero-hallucination hybrid RAG.",
+    "Award-winning editorial B2B review intelligence SaaS platform. High-fashion dark editorial aesthetics powered by DeBERTa-v3 ABSA, HDBSCAN micro-theme induction, STL+EWMA control charts, and zero-hallucination hybrid RAG.",
   keywords: [
     "BrandGuard",
     "Review Intelligence",
@@ -36,8 +43,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`dark ${inter.variable} ${jetbrainsMono.variable}`}>
-      <body className="min-h-screen bg-[#0D0E10] text-[#FFFFFF] antialiased selection:bg-[#10B981]/30 selection:text-white font-sans overflow-x-hidden">
+    <html
+      lang="en"
+      className={`dark ${inter.variable} ${jetbrainsMono.variable} ${playfair.variable}`}
+    >
+      <body className="min-h-screen bg-[#0A1128] text-[#FAF6F0] antialiased selection:bg-[#FF5A36]/30 selection:text-white font-sans overflow-x-hidden">
         {children}
       </body>
     </html>

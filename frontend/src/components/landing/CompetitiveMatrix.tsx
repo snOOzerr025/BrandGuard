@@ -16,7 +16,7 @@ const MATRIX_ROWS: RowData[] = [
     dimension: "Aspect Granularity",
     brandGuard: "Clause-level multi-label DeBERTa-v3 ACD with span boundary extraction",
     competitors: "Document-level sentiment or coarse sentence averages (Enterpret / Chattermill)",
-    impact: "Captures opposing sentiments within the same review sentence (e.g., great ANC, terrible hinge)",
+    impact: "Captures opposing sentiments within the same sentence (e.g., great ANC, terrible hinge)",
   },
   {
     dimension: "Statistical Anomaly Bounds",
@@ -49,26 +49,30 @@ export const CompetitiveMatrix: React.FC = () => {
   const { launchDashboard } = useDashboardStore();
 
   return (
-    <section id="benchmarks" className="py-28 px-6 max-w-7xl mx-auto">
+    <section id="benchmarks" className="py-28 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
       <div className="mb-16 flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
-          <div className="inline-flex items-center gap-2 font-mono text-xs text-[#10B981] tracking-widest uppercase mb-3">
-            <span>03 / ARCHITECTURAL TEARDOWN</span>
+          <div className="inline-flex items-center gap-2 font-mono text-xs text-[#FF5A36] tracking-widest uppercase mb-3">
+            <span>05 / ARCHITECTURAL TEARDOWN</span>
           </div>
-          <h2 className="text-3xl sm:text-5xl font-black uppercase tracking-tight text-white max-w-xl">
-            COMPETITIVE BENCHMARK MATRIX
+          <h2 className="text-3xl sm:text-5xl lg:text-6xl font-black uppercase tracking-tight text-white max-w-2xl">
+            COMPETITIVE{" "}
+            <span className="font-serif italic font-normal text-[#FF5A36]">
+              benchmark matrix.
+            </span>
           </h2>
         </div>
-        <p className="text-sm font-mono text-[#8A8F9E] max-w-sm">
-          BrandGuard is engineered to replace legacy blackbox NLP platforms with deterministic, decision-grade mathematical precision.
+        <p className="text-sm font-mono text-[#FAF6F0]/70 max-w-md">
+          BrandGuard is engineered to replace legacy blackbox NLP platforms with deterministic,
+          decision-grade mathematical precision.
         </p>
       </div>
 
-      <div className="border border-white/10 rounded-3xl overflow-hidden bg-[#13151A]/80 backdrop-blur-xl shadow-2xl">
-        <div className="grid grid-cols-12 p-6 border-b border-white/10 text-xs font-mono tracking-widest text-[#8A8F9E] uppercase bg-[#0D0E10]/70">
+      <div className="border border-white/10 rounded-3xl overflow-hidden bg-[#0E1833]/85 backdrop-blur-xl shadow-2xl">
+        <div className="grid grid-cols-12 p-6 border-b border-white/10 text-xs font-mono tracking-widest text-[#8A8F9E] uppercase bg-[#0A1128]/80">
           <div className="col-span-3">Architectural Dimension</div>
-          <div className="col-span-5 text-[#10B981] font-bold flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-[#10B981]" />
+          <div className="col-span-5 text-[#FF5A36] font-bold flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-[#FF5A36]" />
             BrandGuard Platform
           </div>
           <div className="col-span-4 text-slate-400">Legacy Competitors</div>
@@ -84,33 +88,33 @@ export const CompetitiveMatrix: React.FC = () => {
                 onMouseLeave={() => setHoveredIdx(null)}
                 className={`grid grid-cols-12 p-6 transition-all duration-200 items-center gap-4 cursor-default ${
                   isHovered
-                    ? "bg-[#10B981]/5 border-l-4 border-l-[#10B981]"
+                    ? "bg-[#FF5A36]/5 border-l-4 border-l-[#FF5A36]"
                     : "hover:bg-white/[0.02]"
                 }`}
               >
                 {/* Dimension */}
                 <div className="col-span-12 md:col-span-3">
-                  <span className="text-sm font-bold text-white uppercase tracking-tight block">
+                  <span className="text-sm font-bold text-white uppercase tracking-tight block font-sans">
                     {row.dimension}
                   </span>
-                  <span className="text-xs text-[#8A8F9E] mt-1 block font-sans">
+                  <span className="text-xs text-[#8A8F9E] mt-1 block font-mono">
                     {row.impact}
                   </span>
                 </div>
 
                 {/* BrandGuard */}
                 <div className="col-span-12 md:col-span-5">
-                  <div className="p-3.5 rounded-xl bg-[#0D0E10] border border-[#10B981]/30 text-xs font-mono text-slate-100 flex items-start gap-3 shadow-inner">
-                    <Check className="w-4 h-4 text-[#10B981] shrink-0 mt-0.5" />
+                  <div className="p-3.5 rounded-xl bg-[#0A1128] border border-[#FF5A36]/35 text-xs font-mono text-[#FAF6F0] flex items-start gap-3 shadow-inner">
+                    <Check className="w-4 h-4 text-[#FF5A36] shrink-0 mt-0.5" />
                     <span className="leading-relaxed">{row.brandGuard}</span>
                   </div>
                 </div>
 
                 {/* Legacy Competitors */}
                 <div className="col-span-12 md:col-span-4">
-                  <div className="p-3.5 rounded-xl bg-[#0D0E10]/40 border border-white/5 text-xs text-[#8A8F9E] flex items-start gap-3">
-                    <X className="w-4 h-4 text-[#EF4444] shrink-0 mt-0.5" />
-                    <span className="leading-relaxed">{row.competitors}</span>
+                  <div className="p-3.5 rounded-xl bg-[#0A1128]/50 border border-white/5 text-xs text-[#8A8F9E] flex items-start gap-3">
+                    <X className="w-4 h-4 text-[#DC2626] shrink-0 mt-0.5" />
+                    <span className="leading-relaxed font-sans">{row.competitors}</span>
                   </div>
                 </div>
               </div>
@@ -119,17 +123,17 @@ export const CompetitiveMatrix: React.FC = () => {
         </div>
 
         {/* Footer Banner */}
-        <div className="p-6 bg-[#0D0E10] border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="p-6 bg-[#0A1128] border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <Sparkles className="w-5 h-5 text-[#10B981]" />
-            <span className="text-xs font-mono text-[#8A8F9E]">
-              Ready to verify against live review datasets?
+            <Sparkles className="w-5 h-5 text-[#FF5A36]" />
+            <span className="text-xs font-mono text-[#FAF6F0]">
+              Ready to verify against live production review telemetry?
             </span>
           </div>
           <button
             type="button"
             onClick={() => launchDashboard()}
-            className="px-6 py-2.5 rounded-full bg-[#10B981] hover:bg-[#059669] text-[#0D0E10] text-xs font-mono font-bold tracking-wider flex items-center gap-2 transition-all cursor-pointer"
+            className="px-6 py-3 rounded-xl bg-[#FF5A36] hover:bg-[#FF451D] text-white text-xs font-mono font-bold tracking-wider flex items-center gap-2 transition-all cursor-pointer shadow-[0_0_25px_rgba(255,90,54,0.3)] hover:scale-105 active:scale-95"
           >
             <span>Launch Live Dashboard</span>
             <ArrowRight className="w-4 h-4" />

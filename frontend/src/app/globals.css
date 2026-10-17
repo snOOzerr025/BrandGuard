@@ -12,7 +12,41 @@
   --color-brand-muted: #8A8F9E;
   --color-brand-text: #FFFFFF;
 
+  /* Editorial Palettes */
+  --color-ivory-base: #FAF6F0;
+  --color-ivory-warm: #F5ECE1;
+  --color-ivory-cream: #EFE4D4;
+  --color-editorial-blue: #0A1128;
+  --color-editorial-blue-deep: #050914;
+  --color-editorial-blue-card: #0F1A38;
+  --color-coral-orange: #FF5A36;
+  --color-coral-light: #FF7A5C;
+  --color-coral-glow: rgba(255, 90, 54, 0.28);
+
+  --color-sage-base: #9CAF88;
+  --color-sage-soft: #D2DCB6;
+  --color-olive-deep: #242C1D;
+  --color-olive-dark: #181E13;
+  --color-olive-card: #2C3524;
+  --color-concrete-grey: #64748B;
+  --color-concrete-light: #94A3B8;
+
+  --color-strawberry-soft: #FDE2E4;
+  --color-strawberry-pink: #FFA6B6;
+  --color-crimson-vibrant: #DC2626;
+  --color-lime-vibrant: #84CC16;
+  --color-lime-electric: #A3E635;
+
+  --color-cosmic-latte: #FFF8E7;
+  --color-mocha-cream: #EADBC8;
+  --color-mocha-dark: #251D1A;
+  --color-mocha-card: #332723;
+  --color-burgundy-deep: #4A0E17;
+  --color-burgundy-dark: #2B070D;
+  --color-burgundy-card: #380B12;
+
   --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-serif: "Playfair Display", Georgia, serif;
   --font-mono: "JetBrains Mono", monospace;
 }
 
@@ -21,8 +55,8 @@
 }
 
 html {
-  background-color: #0D0E10;
-  color: #FFFFFF;
+  background-color: #0A1128;
+  color: #FAF6F0;
   color-scheme: dark;
   font-family: var(--font-sans);
   text-rendering: optimizeLegibility;
@@ -30,8 +64,8 @@ html {
 }
 
 body {
-  background-color: #0D0E10;
-  color: #FFFFFF;
+  background-color: #0A1128;
+  color: #FAF6F0;
   min-height: 100vh;
   overflow-x: hidden;
 }
@@ -42,42 +76,76 @@ body {
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #0D0E10;
+  background: #080D1A;
 }
 ::-webkit-scrollbar-thumb {
-  background: #1F232B;
+  background: #1C2640;
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #10B981;
+  background: #FF5A36;
 }
 
-/* Obsidian Glassmorphism Utilities */
+/* Precision Swiss / Architectural Grids */
+.bg-editorial-grid {
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+.bg-editorial-grid-light {
+  background-image: 
+    linear-gradient(to right, rgba(100, 116, 139, 0.12) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(100, 116, 139, 0.12) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+/* Editorial Glassmorphism Utilities */
 .glass-panel {
-  background: rgba(19, 21, 26, 0.75);
+  background: rgba(14, 24, 48, 0.78);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .glass-card {
-  background: rgba(19, 21, 26, 0.65);
+  background: rgba(15, 26, 56, 0.65);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.09);
   box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.6);
 }
 
 .glass-card:hover {
-  border-color: rgba(16, 185, 129, 0.35);
-  box-shadow: 0 15px 35px -5px rgba(16, 185, 129, 0.08);
+  border-color: rgba(255, 90, 54, 0.4);
+  box-shadow: 0 15px 35px -5px rgba(255, 90, 54, 0.12);
 }
 
-.glass-pill {
-  background: rgba(16, 185, 129, 0.08);
+.glass-pill-coral {
+  background: rgba(255, 90, 54, 0.08);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(16, 185, 129, 0.25);
+  border: 1px solid rgba(255, 90, 54, 0.3);
+}
+
+/* Gradient text helpers */
+.text-gradient-coral {
+  background: linear-gradient(135deg, #FAF6F0 0%, #FF5A36 60%, #FF8A6E 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-gradient-ivory {
+  background: linear-gradient(135deg, #FFFFFF 0%, #FAF6F0 50%, #D8CEBE 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-gradient-strawberry {
+  background: linear-gradient(135deg, #FFFFFF 0%, #FFA6B6 60%, #DC2626 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 /* Marquee continuous scroll */
