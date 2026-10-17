@@ -52,6 +52,8 @@ def _insert_sentiment_rows(
     from backend.app.models.sentiment_result import SentimentResult
 
     for polarity, ts in polarity_and_times:
+        pol_val = polarity.lower() if isinstance(polarity, str) else str(polarity).lower()
+        num_score = 1.0 if "pos" in pol_val else (-1.0 if "neg" in pol_val else 0.0)
         row = SentimentResult(
             user_id=user_id,
             review_id=review_id,
@@ -59,7 +61,9 @@ def _insert_sentiment_rows(
             aspect=aspect,
             polarity=polarity,
             confidence=0.90,
+            numeric_score=num_score,
             model_version="v2-test",
+            created_at=ts,
             computed_at=ts,
         )
         session.add(row)
@@ -94,15 +98,15 @@ def _setup_spike(session: Session, email: str, client) -> tuple[str, str, str]:
     session.commit()
     session.refresh(review)
 
-    # Baseline: 15 positives (8–37 days ago)
+    # Baseline: 30 positives (8–28 days ago)
     baseline_rows = [
-        ("positive", NOW - timedelta(days=RECENT_DAYS + i + 1))
-        for i in range(15)
+        ("positive", NOW - timedelta(days=RECENT_DAYS + (i % 20) + 1))
+        for i in range(30)
     ]
-    # Recent: 10 negatives (0–6 days ago)
+    # Recent: 15 negatives (within last 30 hours to satisfy support & burst thresholds)
     recent_rows = [
-        ("negative", NOW - timedelta(days=i))
-        for i in range(10)
+        ("negative", NOW - timedelta(hours=i * 2 + 1))
+        for i in range(15)
     ]
 
     _insert_sentiment_rows(
@@ -168,8 +172,8 @@ class TestAlertsEndpoints:
         data = resp.json()
         assert data["new_alerts"] >= 1
 
-        severities = [a["severity"] for a in data["alerts"]]
-        assert "high" in severities
+        severities = [a["severity"].lower() for a in data["alerts"]]
+        assert any(s in ("high", "critical") for s in severities)
 
     def test_scan_dedup_no_duplicates(self, client, session):
         """

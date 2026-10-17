@@ -1,181 +1,156 @@
 """
-services/absa_service.py
--------------------------
-ABSA pipeline orchestrator — ties together:
-  1. SentimentAnalyzer    → overall review-level sentiment
-  2. AspectExtractor      → sentence-level per-aspect polarity
-  3. ReviewEncoder        → 384-dim embeddings for pgvector + clustering
-  4. ReviewClusterer      → KMeans theme discovery
+services/absa_service.py — SOTA Aspect-Based Sentiment Analysis Orchestrator
+----------------------------------------------------------------------------
+Orchestrates the two-stage decoupled ABSA pipeline:
+  Stage 1: Multi-Label Aspect Category Detection (ACDEngine)
+           Detects explicit and implicit product aspects across 8 canonical dimensions
+           plus General, routing novel/unmatched complaints to Miscellaneous nursery.
+  Stage 2: Aspect-Guided Polarity Classification (ONNXABSAEngine)
+           Disentangles clause-level sentiment across contrastive boundaries.
 
-Writes SentimentResult rows to the database (insert-only — never update).
-This is the service the API layer (Phase 3) will call.
-
-One concern = one module. This service does orchestration only; it does not
-contain ML model code or DB connection logic.
+Persists SentimentResult rows (insert-only) and flags star-vs-text rating discrepancies.
 """
 from __future__ import annotations
 
-import json
+import re
 import uuid
-from datetime import datetime, timezone
-from typing import Optional
+from typing import List, Optional
 
-from sqlmodel import Session
+from sqlmodel import Session, select
 
-from backend.app.ml.absa.aspect_extractor import AspectExtractor
-from backend.app.ml.absa.sentiment_analyzer import SentimentAnalyzer
-from backend.app.ml.embeddings.cluster import ReviewClusterer
-from backend.app.ml.embeddings.encoder import ReviewEncoder
-from backend.app.models.review import Review
-from backend.app.models.sentiment_result import SentimentResult
+from backend.app.ml.absa.acd_engine import ACDEngine, AspectActivation
+from backend.app.ml.absa.onnx_engine import AspectSentimentOutput, ONNXABSAEngine
+from backend.app.models.domain import Review, SentimentResult
 
-MODEL_VERSION = "v2-distilbert-threshold-0.70-sentence-level"
+MODEL_VERSION = "v3-deberta-absa-onnx-int8"
 
 
 class ABSAService:
     """
-    Runs the full ABSA pipeline for a set of reviews and persists results.
-
-    Lazy-loads ML models on first call (not on import) to avoid
-    slow startup in the API server for unrelated requests.
+    Two-stage SOTA ABSA pipeline service.
+    Orchestrates aspect extraction and polarity classification for reviews.
     """
 
     def __init__(self):
-        self._analyzer: Optional[SentimentAnalyzer] = None
-        self._extractor: Optional[AspectExtractor] = None
-        self._encoder: Optional[ReviewEncoder] = None
-        self._clusterer: Optional[ReviewClusterer] = None
+        self._acd_engine: Optional[ACDEngine] = None
+        self._asc_engine: Optional[ONNXABSAEngine] = None
 
-    # -----------------------------------------------------------------------
-    # Lazy model loaders
-    # -----------------------------------------------------------------------
+    def _get_acd_engine(self) -> ACDEngine:
+        if self._acd_engine is None:
+            self._acd_engine = ACDEngine()
+        return self._acd_engine
 
-    def _get_analyzer(self) -> SentimentAnalyzer:
-        if self._analyzer is None:
-            self._analyzer = SentimentAnalyzer()
-        return self._analyzer
+    def _get_asc_engine(self) -> ONNXABSAEngine:
+        if self._asc_engine is None:
+            self._asc_engine = ONNXABSAEngine()
+        return self._asc_engine
 
-    def _get_extractor(self) -> AspectExtractor:
-        if self._extractor is None:
-            self._extractor = AspectExtractor(self._get_analyzer())
-        return self._extractor
-
-    def _get_encoder(self) -> ReviewEncoder:
-        if self._encoder is None:
-            self._encoder = ReviewEncoder()
-        return self._encoder
-
-    def _get_clusterer(self) -> ReviewClusterer:
-        if self._clusterer is None:
-            self._clusterer = ReviewClusterer(n_clusters=8)
-        return self._clusterer
-
-    # -----------------------------------------------------------------------
-    # Public API
-    # -----------------------------------------------------------------------
-
-    def run_pipeline(
-        self,
-        reviews: list[Review],
+    @classmethod
+    def analyze_and_store(
+        cls,
+        review_id: uuid.UUID,
+        text: str,
+        user_id: uuid.UUID,
+        product_id: uuid.UUID,
         session: Session,
-        run_clustering: bool = True,
-    ) -> list[SentimentResult]:
-        """
-        Full pipeline: sentiment + aspects + embeddings + clusters → DB rows.
+    ) -> List[SentimentResult]:
+        """Convenience class method to analyze a single review and persist results."""
+        service = cls()
+        return service.process_review(review_id, text, user_id, product_id, session)
 
-        Args:
-            reviews:         List of Review ORM objects with text populated.
-            session:         SQLModel DB session (caller manages commit).
-            run_clustering:  Whether to compute embeddings + clusters this run.
-
-        Returns:
-            List of inserted SentimentResult rows.
+    def process_review(
+        self,
+        review_id: uuid.UUID,
+        text: str,
+        user_id: uuid.UUID,
+        product_id: uuid.UUID,
+        session: Session,
+    ) -> List[SentimentResult]:
         """
-        if not reviews:
+        Processes review text through sentence-level ACD and ASC pipelines,
+        writing SentimentResult rows to the database and checking for star rating discrepancy.
+        """
+        if not text or not text.strip():
             return []
 
-        texts = [r.text for r in reviews]
-        analyzer = self._get_analyzer()
-        extractor = self._get_extractor()
+        acd = self._get_acd_engine()
+        asc = self._get_asc_engine()
 
-        print(f"[ABSAService] Running pipeline on {len(reviews)} reviews...")
+        # Split review into sentences
+        sentences = self._split_sentences(text)
+        created_results: List[SentimentResult] = []
+        numeric_scores: List[float] = []
 
-        # 1. Overall review-level sentiment
-        overall_sentiments = analyzer.predict(texts)
+        for sent in sentences:
+            if not sent.strip():
+                continue
 
-        # 2. Aspect-level sentence extraction + sentiment
-        aspect_df = extractor.analyze_reviews(texts)
-        aspect_mentions = extractor.extract_mentions(texts)
+            # Stage 1: Detect all explicit and implicit aspect categories
+            activations: List[AspectActivation] = acd.detect_aspects(sent)
 
-        # 3. Embeddings + clustering
-        cluster_results: dict = {}
-        if run_clustering:
-            encoder = self._get_encoder()
-            embeddings = encoder.encode(texts, show_progress=False)
-            clusterer = self._get_clusterer()
-            cluster_results = clusterer.fit(embeddings, texts)
-
-        cluster_ids = cluster_results.get("cluster_ids", [])
-        cluster_labels = cluster_results.get("cluster_labels", {})
-
-        # 4. Build SentimentResult rows — one per review × aspect that has a mention
-        result_rows: list[SentimentResult] = []
-        computed_at = datetime.now(tz=timezone.utc)
-
-        for review_idx, review in enumerate(reviews):
-            overall = overall_sentiments[review_idx]
-            cluster_id = int(cluster_ids[review_idx]) if len(cluster_ids) > review_idx else None
-            cluster_label = cluster_labels.get(cluster_id) if cluster_id is not None else None
-
-            # Aspects that mention this specific review
-            review_aspects: list[tuple[str, str]] = []
-            for aspect, mentions in aspect_mentions.items():
-                for ridx, sentence in mentions:
-                    if ridx == review_idx:
-                        review_aspects.append((aspect, sentence))
-
-            if not review_aspects:
-                # No specific aspect found — store overall sentiment under "General"
-                review_aspects = [("General", review.text[:200])]
-
-            for aspect, span in review_aspects:
-                # Get aspect-level sentiment from the sentence span
-                aspect_result = analyzer.predict_one(span)
+            # Stage 2: Classify aspect-conditioned sentiment for each detected category
+            for act in activations:
+                res: AspectSentimentOutput = asc.classify_aspect_polarity(
+                    sentence=sent,
+                    aspect=act.aspect,
+                    extracted_span=act.extracted_span,
+                    is_implicit=act.is_implicit,
+                )
 
                 row = SentimentResult(
-                    user_id=review.user_id,
-                    review_id=review.id,
-                    product_id=review.product_id,
-                    aspect=aspect,
-                    polarity=aspect_result["label"],
-                    confidence=aspect_result["confidence"],
-                    aspect_text_span=span[:500],  # truncate long spans
-                    cluster_id=cluster_id,
-                    cluster_label=cluster_label,
+                    review_id=review_id,
+                    user_id=user_id,
+                    product_id=product_id,
+                    aspect_category=res.aspect,
+                    extracted_span=res.extracted_span,
+                    is_implicit=res.is_implicit,
+                    polarity=res.polarity,
+                    confidence=res.confidence,
+                    numeric_score=res.numeric_score,
                     model_version=MODEL_VERSION,
-                    computed_at=computed_at,
                 )
                 session.add(row)
-                result_rows.append(row)
+                created_results.append(row)
+                numeric_scores.append(res.numeric_score)
 
-        print(f"[ABSAService] Inserting {len(result_rows)} SentimentResult rows...")
-        return result_rows
+        session.commit()
 
-    def get_aspect_summary(
-        self, reviews: list[Review]
-    ) -> list[dict]:
-        """
-        Lightweight aspect summary without DB writes — used by the API
-        for on-demand analysis of a small batch.
+        # Check Star-vs-Text Rating Discrepancy
+        review = session.get(Review, review_id)
+        if review and numeric_scores:
+            mean_score = sum(numeric_scores) / len(numeric_scores)
+            # High star rating (>=4) with strongly negative text (<=-0.5)
+            # Low star rating (<=2) with strongly positive text (>=+0.5)
+            if (review.rating >= 4 and mean_score <= -0.5) or (review.rating <= 2 and mean_score >= 0.5):
+                review.has_rating_discrepancy = True
+                session.add(review)
+                session.commit()
 
-        Returns list of {aspect, mention_count, positive_count, negative_count,
-                         neutral_count, positive_ratio, sentiment_score}
-        """
-        texts = [r.text for r in reviews]
-        extractor = self._get_extractor()
-        df = extractor.analyze_reviews(texts)
-        return df.to_dict("records")
+        for r in created_results:
+            session.refresh(r)
+
+        return created_results
+
+    @staticmethod
+    def _split_sentences(text: str) -> List[str]:
+        """Splits review body into sentence segments using regex delimiters."""
+        raw_sents = re.split(r"(?<=[.!?])\s+|\n+", text)
+        return [s.strip() for s in raw_sents if s.strip()]
+
+    def run_pipeline(self, reviews: List[Review], session: Session) -> List[SentimentResult]:
+        """Process a list of reviews and write SentimentResults."""
+        all_results: List[SentimentResult] = []
+        for r in reviews:
+            body = r.body if hasattr(r, "body") and r.body else r.text
+            res = self.process_review(
+                review_id=r.id,
+                text=body,
+                user_id=r.user_id,
+                product_id=r.product_id,
+                session=session,
+            )
+            all_results.extend(res)
+        return all_results
 
 
-# Module-level singleton — shared across requests in the same process
 absa_service = ABSAService()

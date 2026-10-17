@@ -6,6 +6,7 @@ Strict typing prevents Gemini hallucinating structure.
 """
 from __future__ import annotations
 
+import uuid
 from enum import Enum
 from typing import Optional
 
@@ -70,8 +71,51 @@ class ChatResponse(BaseModel):
 
 
 # ---------------------------------------------------------------------------
-# Chat request (API layer)
+# SOTA Copilot Structured Response & Post-Generation Verification Schemas
+# ---------------------------------------------------------------------------
+
+class CitedClaim(BaseModel):
+    statement: str = Field(description="Single factual claim synthesized from evidence.")
+    cited_review_ids: list[str] = Field(
+        description="Exact UUIDs from <verified_review_evidence> supporting this claim."
+    )
+    confidence: float = Field(default=0.90, ge=0.0, le=1.0)
+
+
+class CopilotStructuredResponse(BaseModel):
+    executive_summary: str = Field(
+        description="Concise 2-4 sentence executive diagnosis strictly grounded in evidence."
+    )
+    quantitative_metrics_used: list[str] = Field(
+        default_factory=list,
+        description="Deterministic metrics injected from <deterministic_sql_facts>.",
+    )
+    claims: list[CitedClaim] = Field(
+        default_factory=list,
+        description="Claims verified with exact source review UUID citations.",
+    )
+    insufficient_evidence_warning: bool = Field(
+        default=False,
+        description="True if available reviews do not provide sufficient evidence.",
+    )
+    latency_ms: float = Field(default=0.0)
+
+
+class CopilotAskFilters(BaseModel):
+    date_from: Optional[str] = None
+    date_to: Optional[str] = None
+    aspect: Optional[str] = None
+
+
+class CopilotAskRequest(BaseModel):
+    product_id: uuid.UUID
+    query: str = Field(min_length=3, max_length=1000)
+    filters: Optional[CopilotAskFilters] = None
+
+
+# ---------------------------------------------------------------------------
+# Chat request (Legacy API layer compatibility)
 # ---------------------------------------------------------------------------
 
 class ChatRequest(BaseModel):
-    question: str = Field(min_length=5, max_length=1000)
+    question: str = Field(min_length=3, max_length=1000)

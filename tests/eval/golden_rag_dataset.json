@@ -1,0 +1,38 @@
+[
+  {
+    "query": "What percentage of reviews complained about battery life, and what was the net sentiment?",
+    "intent": "SQL_AGGREGATE",
+    "aspect": "Battery",
+    "ground_truth_metrics": ["Battery_net_sentiment", "total_reviews"],
+    "requires_citations": false
+  },
+  {
+    "query": "What specific charging cables or wire defects are users describing?",
+    "intent": "PURE_VECTOR",
+    "aspect": "Battery",
+    "ground_truth_claims": ["charging wire frayed", "cable melted"],
+    "requires_citations": true
+  },
+  {
+    "query": "Why did our product rating drop in the last 14 days, and what are customers saying caused it?",
+    "intent": "HYBRID",
+    "aspect": "Quality",
+    "ground_truth_metrics": ["product_average_rating", "star_impact"],
+    "ground_truth_claims": ["defect", "broke"],
+    "requires_citations": true
+  },
+  {
+    "query": "How many total reviews mention shipping delays and what is the star impact of Delivery?",
+    "intent": "SQL_AGGREGATE",
+    "aspect": "Delivery",
+    "ground_truth_metrics": ["Delivery_star_impact", "Delivery_mentions"],
+    "requires_citations": false
+  },
+  {
+    "query": "What are customers saying about the packaging and box condition upon delivery?",
+    "intent": "PURE_VECTOR",
+    "aspect": "Packaging",
+    "ground_truth_claims": ["box was crushed", "dented"],
+    "requires_citations": true
+  }
+]

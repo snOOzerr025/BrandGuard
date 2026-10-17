@@ -10,6 +10,20 @@ from sqlmodel import Session, SQLModel, create_engine
 from sqlmodel.pool import StaticPool
 
 import backend.app.models  # noqa: F401 — registers all model metadata
+from sqlalchemy.ext.compiler import compiles
+from sqlalchemy.dialects.postgresql import TSVECTOR
+from backend.app.models.domain import Vector
+
+
+@compiles(TSVECTOR, "sqlite")
+def compile_tsvector_sqlite(type_, compiler, **kw):
+    return "TEXT"
+
+
+@compiles(Vector, "sqlite")
+def compile_vector_sqlite(type_, compiler, **kw):
+    return "TEXT"
+
 
 
 @pytest.fixture(name="engine")
@@ -23,11 +37,20 @@ def engine_fixture():
     """
     import backend.app.db.session as db_session
 
+    import sqlite3
+    from sqlalchemy import event
+
     engine = create_engine(
         "sqlite://",
         connect_args={"check_same_thread": False},
         poolclass=StaticPool,
     )
+
+    @event.listens_for(engine, "connect")
+    def _sqlite_connect(dbapi_connection, connection_record):
+        if isinstance(dbapi_connection, sqlite3.Connection):
+            dbapi_connection.create_function("to_tsvector", 2, lambda lang, text: text or "", deterministic=True)
+
     SQLModel.metadata.create_all(engine)
 
     # Patch module-level engine so background tasks get the test DB

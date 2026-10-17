@@ -24,6 +24,16 @@ class Settings(BaseSettings):
     # Redis Configuration
     REDIS_HOST: str = "localhost"
     REDIS_PORT: int = 6379
+    REDIS_BROKER_URL: Optional[str] = None
+    REDIS_BACKEND_URL: Optional[str] = None
+
+    @property
+    def broker_url(self) -> str:
+        return self.REDIS_BROKER_URL or f"redis://{self.REDIS_HOST}:{self.REDIS_PORT}/0"
+
+    @property
+    def result_backend_url(self) -> str:
+        return self.REDIS_BACKEND_URL or f"redis://{self.REDIS_HOST}:{self.REDIS_PORT}/1"
 
     # LLM APIs
     GEMINI_API_KEY: Optional[str] = None

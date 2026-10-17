@@ -1,0 +1,15 @@
+{"text": "The battery lasts all week, though the plastic casing feels cheap and arrived dented.", "expected": [{"aspect": "Battery", "polarity": "Positive", "is_implicit": false}, {"aspect": "Quality", "polarity": "Negative", "is_implicit": false}, {"aspect": "Packaging", "polarity": "Negative", "is_implicit": false}]}
+{"text": "It shut off after 20 minutes and refused to turn back on.", "expected": [{"aspect": "Battery", "polarity": "Negative", "is_implicit": true}]}
+{"text": "Took three weeks to reach Mumbai and the courier never updated tracking.", "expected": [{"aspect": "Delivery", "polarity": "Negative", "is_implicit": true}]}
+{"text": "The sound quality is crisp and punchy, definitely worth every penny.", "expected": [{"aspect": "Performance", "polarity": "Positive", "is_implicit": false}, {"aspect": "Price", "polarity": "Positive", "is_implicit": true}]}
+{"text": "Customer support agent was extremely helpful and processed my replacement immediately.", "expected": [{"aspect": "Service", "polarity": "Positive", "is_implicit": false}]}
+{"text": "The box was completely crushed and looked like it was run over by a truck.", "expected": [{"aspect": "Packaging", "polarity": "Negative", "is_implicit": true}]}
+{"text": "Sleek and lightweight design, fits comfortably in my pocket.", "expected": [{"aspect": "Design", "polarity": "Positive", "is_implicit": false}]}
+{"text": "This product is an absolute rip-off, cheap materials that fell apart in 2 days.", "expected": [{"aspect": "Price", "polarity": "Negative", "is_implicit": true}, {"aspect": "Quality", "polarity": "Negative", "is_implicit": false}]}
+{"text": "Gets uncomfortably hot during fast charging and drains rapidly.", "expected": [{"aspect": "Performance", "polarity": "Negative", "is_implicit": true}, {"aspect": "Battery", "polarity": "Negative", "is_implicit": true}]}
+{"text": "The headphones come in a standard matte black finish with volume buttons.", "expected": [{"aspect": "Design", "polarity": "Neutral", "is_implicit": false}]}
+{"text": "Shipped via FedEx and arrived within 24 hours in pristine condition.", "expected": [{"aspect": "Delivery", "polarity": "Positive", "is_implicit": false}, {"aspect": "Packaging", "polarity": "Positive", "is_implicit": false}]}
+{"text": "Customer service hung up on me twice when I asked for a refund.", "expected": [{"aspect": "Service", "polarity": "Negative", "is_implicit": true}]}
+{"text": "Outstanding build quality and premium aluminum frame.", "expected": [{"aspect": "Quality", "polarity": "Positive", "is_implicit": false}]}
+{"text": "The wireless connection stutters constantly and drops audio.", "expected": [{"aspect": "Performance", "polarity": "Negative", "is_implicit": true}]}
+{"text": "Very affordable price point for an entry-level smartwatch.", "expected": [{"aspect": "Price", "polarity": "Positive", "is_implicit": false}]}

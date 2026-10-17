@@ -5,12 +5,16 @@ from fastapi.middleware.cors import CORSMiddleware
 
 # Initialize logging on startup
 import backend.app.core.logging as app_logging
+from backend.app.api.routes import alerts as alerts_router
+from backend.app.api.routes import chat as chat_router
+from backend.app.api.routes import copilot as copilot_router
 from backend.app.api.routes import health
+from backend.app.api.routes import ingest as ingest_router
+from backend.app.api.routes import insights as insights_router
 from backend.app.api.routes import products as products_router
 from backend.app.api.routes import reviews as reviews_router
-from backend.app.api.routes import insights as insights_router
-from backend.app.api.routes import chat as chat_router
-from backend.app.api.routes import alerts as alerts_router
+from backend.app.api.routes import tasks as tasks_router
+from backend.app.api.routes import webhooks as webhooks_router
 from backend.app.auth import router as auth_router
 from backend.app.core.config import settings
 
@@ -50,9 +54,14 @@ def create_app() -> FastAPI:
     app.include_router(auth_router.router, prefix="/api/v1", tags=["auth"])
     app.include_router(products_router.router, prefix="/api/v1", tags=["products"])
     app.include_router(reviews_router.router, prefix="/api/v1", tags=["reviews"])
+    app.include_router(reviews_router.stream_router, prefix="/api/v1", tags=["reviews-stream"])
     app.include_router(insights_router.router, prefix="/api/v1", tags=["insights"])
     app.include_router(chat_router.router, prefix="/api/v1", tags=["ask-brandguard"])
     app.include_router(alerts_router.router, prefix="/api/v1", tags=["alerts"])
+    app.include_router(tasks_router.router, prefix="/api/v1", tags=["tasks"])
+    app.include_router(ingest_router.router, prefix="/api/v1", tags=["ingest"])
+    app.include_router(copilot_router.router, prefix="/api/v1", tags=["copilot"])
+    app.include_router(webhooks_router.router, prefix="/api/v1", tags=["webhooks"])
 
     return app
 

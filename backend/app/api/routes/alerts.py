@@ -45,7 +45,7 @@ class AlertRead(BaseModel):
             id=alert.id,
             product_id=alert.product_id,
             alert_type=alert.alert_type,
-            severity=alert.severity,
+            severity=alert.severity.value.lower() if hasattr(alert.severity, "value") else str(alert.severity).lower(),
             aspect=alert.aspect,
             message=alert.message,
             is_acknowledged=alert.is_acknowledged,

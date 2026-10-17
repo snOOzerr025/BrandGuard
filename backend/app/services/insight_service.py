@@ -97,13 +97,13 @@ class InsightService:
                 SentimentResult.product_id == product_id,
                 SentimentResult.user_id == user.id,
             )
-            .order_by(SentimentResult.computed_at)
+            .order_by(SentimentResult.created_at)
             .limit(limit)
         )
         if from_dt:
-            query = query.where(SentimentResult.computed_at >= from_dt)
+            query = query.where(SentimentResult.created_at >= from_dt)
         if to_dt:
-            query = query.where(SentimentResult.computed_at <= to_dt)
+            query = query.where(SentimentResult.created_at <= to_dt)
 
         rows = session.exec(query).all()
         return [
@@ -111,10 +111,10 @@ class InsightService:
                 "id": str(row.id),
                 "review_id": str(row.review_id),
                 "aspect": row.aspect,
-                "polarity": row.polarity,
+                "polarity": row.polarity.value.lower() if hasattr(row.polarity, "value") else str(row.polarity).lower(),
                 "confidence": row.confidence,
-                "cluster_id": row.cluster_id,
-                "cluster_label": row.cluster_label,
+                "cluster_id": getattr(row, "cluster_id", None),
+                "cluster_label": getattr(row, "cluster_label", None),
                 "model_version": row.model_version,
                 "computed_at": row.computed_at.isoformat(),
             }

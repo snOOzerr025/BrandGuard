@@ -1,27 +1,26 @@
-"""Database engine and session management."""
-from sqlmodel import Session, SQLModel, create_engine
-
-from backend.app.core.config import settings
-
-engine = create_engine(
-    settings.database_url,
-    echo=settings.DEBUG,
-    pool_pre_ping=True,
+"""
+db/session.py — Database engine and session management.
+------------------------------------------------------
+Re-exports from backend.app.core.database for backward compatibility.
+"""
+from backend.app.core.database import (
+    AsyncSessionLocal,
+    SyncSessionLocal,
+    async_engine,
+    create_db_and_tables,
+    engine,
+    get_async_session,
+    get_session,
+    set_tenant_context,
 )
 
-
-def create_db_and_tables() -> None:
-    """Create all tables defined in SQLModel metadata.
-
-    Used for local dev / testing. Production uses Alembic migrations.
-    """
-    # Import all models so their metadata is registered before create_all
-    import backend.app.models  # noqa: F401
-
-    SQLModel.metadata.create_all(engine)
-
-
-def get_session():
-    """FastAPI dependency — yields a DB session per request."""
-    with Session(engine) as session:
-        yield session
+__all__ = [
+    "engine",
+    "async_engine",
+    "SyncSessionLocal",
+    "AsyncSessionLocal",
+    "get_session",
+    "get_async_session",
+    "create_db_and_tables",
+    "set_tenant_context",
+]
