@@ -45,6 +45,13 @@ class Settings(BaseSettings):
     SENTIMENT_MODEL_NAME: str = "distilbert-base-uncased-finetuned-sst-2-english"
     SUMMARIZER_MODEL_NAME: str = "facebook/bart-large-cnn"
 
+    # JIRA Configuration
+    JIRA_DOMAIN: Optional[str] = None
+    JIRA_EMAIL: Optional[str] = None
+    JIRA_API_TOKEN: Optional[str] = None
+    JIRA_PROJECT_KEY: str = "AXIS"
+    JIRA_ENABLED: bool = False
+
     # Settings config
     model_config = SettingsConfigDict(
         env_file=".env", env_file_encoding="utf-8", extra="ignore"
