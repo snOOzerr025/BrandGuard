@@ -17,12 +17,27 @@
 
 **BrandGuard** is a decision-grade B2B review intelligence system and telemetry engine built for product directors, quality engineers, and market intelligence executives. Unlike traditional "black-box" sentiment trackers, BrandGuard provides:
 
-1. **Sub-25ms Aspect-Based Sentiment Analysis (ABSA)** powered by quantized ONNX models across 8 dimensions (*Quality, Battery, Performance, Design, Price, Delivery, Packaging, Service*).
+1. **Sub-25ms Aspect-Based Sentiment Analysis (ABSA)** powered by quantized ONNX models (DeBERTa-v3) across 8 dimensions (*Quality, Battery, Performance, Design, Price, Delivery, Packaging, Service*), with an automated clause-isolated keyword fallback engine when ONNX weights are absent.
 2. **Deterministic Root-Cause Attribution** via Leave-One-Out (LOO) Shapley-approximate star impact to isolate exact defect drivers down to structural components.
 3. **Statistical Process Control (SPC)** using Deseasonalized EWMA with dynamic $\pm 3\sigma$ control bands for early defect triaging.
-4. **Hybrid RAG Copilot** combining `pgvector` HNSW vector embeddings and full-text PostgreSQL `tsvector` with Reciprocal Rank Fusion (RRF).
+4. **Hybrid RAG Copilot** combining `pgvector` HNSW 384-dimensional vector embeddings (MiniLM) and full-text PostgreSQL `tsvector` with Reciprocal Rank Fusion (RRF).
 5. **Multi-Product Intelligence & Live Ingestion Lab** allowing instant auditing across multiple consumer products or uploading custom CSV review datasets.
-6. **Luxury Glassmorphic Interface** rendered with Next.js 15, Three.js 3D WebGL neural particle lattice, and fluid GLSL fragment shader gradient backgrounds.
+6. **Luxury Glassmorphic Interface** rendered with Next.js 15, Three.js 3D WebGL neural particle lattice, and fluid GLSL fragment shader gradient backgrounds (executive UI demo on mock data).
+
+> [!NOTE]
+> **Implementation Scope & Fallbacks**:
+> - **Frontend**: The Next.js web application is an executive UI demo operating on client-side Zustand state and mock datasets (`frontend/src/lib/api.ts`). The Python backend (`backend/app/`) provides the real API routes, database models, and Celery processing pipeline.
+> - **ABSA Model**: `ONNXABSAEngine` executes INT8 ONNX checkpoints when compiled into `models/deberta_absa_int8/`, automatically falling back to an accurate clause-isolated regex/lexical matching engine when model weights are not present on disk.
+> - **Vector Dimensions**: Dense semantic embeddings utilize 384 dimensions (`Vector(384)`) for efficient CPU inference via Sentence-Transformers MiniLM / BGE-small.
+
+---
+
+## 🔀 Repository Variants
+
+- **`main`**: The foundational review intelligence platform (FastAPI, PostgreSQL 15 with pgvector, Celery 5.4, and Next.js 15).
+- **`variant/bsg-jira-powerbi`**: The **Axis Bank Business Solutions Group (BSG)** variant. Extends the core architecture with:
+  1. **Automated JIRA Cloud Integration**: Asynchronous Celery task creating and updating incident tickets via REST API v3 (and offline `MockJiraClient`), complete with SHA-256 deduplication and recurrence commenting on open tickets.
+  2. **Power BI Reporting Engine**: Star schema export script ([`scripts/export_bi_dataset.py`](scripts/export_bi_dataset.py)) generating dimensional CSVs (`powerbi/data/`) with JIRA left-joins, accompanied by a 2-page MIS dashboard specification and DAX measure reference in [`powerbi/README.md`](powerbi/README.md).
 
 ---
 
@@ -55,7 +70,7 @@ graph TD
 
     subgraph Storage ["Persistent Multi-Modal Data Layer"]
         PG[(PostgreSQL 15)]
-        PGV[(pgvector 1536d HNSW Index)]
+        PGV[(pgvector 384d HNSW Index)]
         TSV[(tsvector Lexical BM25 GIN Index)]
     end
 
@@ -140,8 +155,8 @@ Audits and compares multiple flagship consumer SKUs out-of-the-box:
 | **Styling & Motion** | **Tailwind CSS v4 + Framer Motion** | Hardware-accelerated CSS transforms, glassmorphic backdrop filters, and fluid spring physics. |
 | **State Management** | **Zustand v5** | Lightweight, reactive, zero-boilerplate state store with persistent session sync. |
 | **Backend Framework** | **FastAPI + Pydantic v2** | High-throughput asynchronous async/await execution with compile-time type validation. |
-| **Machine Learning** | **ONNX Runtime + DeBERTa-v3** | Quantized 8-bit model delivering **<25ms inference latency** (4x faster than PyTorch). |
-| **Database & Vector** | **PostgreSQL 15 + `pgvector`** | Enterprise ACID compliance + 1,536-dimensional HNSW index for high-recall vector search. |
+| **Machine Learning** | **ONNX Runtime + DeBERTa-v3** | Quantized 8-bit model (<25ms inference) with automated clause-isolated keyword fallback when weights are absent. |
+| **Database & Vector** | **PostgreSQL 15 + `pgvector`** | Enterprise ACID compliance + 384-dimensional HNSW index (MiniLM) for high-recall vector search. |
 | **Distributed Queue** | **Celery 5.4 + Redis 7** | Sub-85ms asynchronous batch ingestion SLA with fault-tolerant workers. |
 | **Testing & Quality** | **Pytest + TypeScript** | Comprehensive end-to-end integration tests, schema validation, and 100% static type safety. |
 
