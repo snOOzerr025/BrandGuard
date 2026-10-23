@@ -7,6 +7,7 @@ Re-exports all domain models and enumerations from domain.py.
 from backend.app.models.domain import (
     Alert,
     IngestionJob,
+    JiraIssue,
     JobState,
     MicroCluster,
     PlanTier,
@@ -27,6 +28,7 @@ __all__ = [
     "SentimentResult",
     "MicroCluster",
     "Alert",
+    "JiraIssue",
     "QueryLog",
     "PlanTier",
     "JobState",

@@ -20,6 +20,7 @@ from sqlalchemy import (
     Column,
     Computed,
     DateTime,
+    ForeignKey,
     Index,
     Text,
     UniqueConstraint,
@@ -456,3 +457,33 @@ class QueryLog(SQLModel, table=True):
     @question.setter
     def question(self, val: str) -> None:
         self.query_text = val
+
+
+class JiraIssue(SQLModel, table=True):
+    __tablename__ = "jira_issues"
+    __table_args__ = (
+        Index("ix_jira_issues_product_id", "product_id"),
+        Index("ix_jira_issues_jira_key", "jira_key"),
+    )
+
+    id: uuid.UUID = Field(
+        default_factory=uuid.uuid4,
+        sa_column=Column(PG_UUID(as_uuid=True), primary_key=True),
+    )
+    alert_id: uuid.UUID = Field(
+        sa_column=Column(PG_UUID(as_uuid=True), ForeignKey("alerts.id", ondelete="CASCADE"), unique=True, nullable=False),
+    )
+    product_id: uuid.UUID = Field(
+        sa_column=Column(PG_UUID(as_uuid=True), ForeignKey("products.id", ondelete="CASCADE"), nullable=False),
+    )
+    jira_key: str = Field(max_length=64, nullable=False)
+    status: str = Field(default="To Do", max_length=64, nullable=False)
+    summary: Optional[str] = Field(default=None, max_length=512)
+    created_at: datetime = Field(
+        default_factory=lambda: datetime.now(timezone.utc),
+        sa_column=Column(DateTime(timezone=True), server_default=func.now(), nullable=False),
+    )
+    updated_at: datetime = Field(
+        default_factory=lambda: datetime.now(timezone.utc),
+        sa_column=Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False),
+    )
