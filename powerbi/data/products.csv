@@ -1,0 +1,4 @@
+product_id,name,category,source,review_count,brand_health_score,net_sentiment,created_at
+f7e56143-164e-4186-8932-6dc589594e98,Apple AirPods Pro (2nd Gen),General,apple_store,1240,89.1,44.6,2026-08-24T05:31:51.643857
+8271af28-85d3-4042-899b-9c14c17dbcdb,Dyson Airwrap Multi-Styler Complete,General,direct_retail,620,79.5,18.2,2026-08-24T05:31:51.643857
+48c7c8d5-2882-444b-a847-fb6af8aa32c1,Sony WH-1000XM5 Noise-Canceling Headphones,General,amazon_verified,850,84.2,28.4,2026-08-24T05:31:51.643857
